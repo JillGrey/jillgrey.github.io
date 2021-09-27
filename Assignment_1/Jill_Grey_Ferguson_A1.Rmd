@@ -410,20 +410,20 @@ pge_COVID_residential_chart <- pge_COVID_residential %>%
 pge_COVID_residential_chart
 ```
 
-### Interpretation of COVID-19's impact on PG&E's residential energy usage (2019 vs 2020):
+### COVID-19's Impact on PG&E's Residential Energy Usage (2019 vs 2020):
 
 ### Assumptions and Caveats 
 * 2019 is pre-COIVD period
-* 2020 is post-COVID period 
-* We would need to conduct weather normalization on pre-COVID home energy usage (2019) and post-COVID home energy usage to really isolate COVID-19's impact. 
-* Energy demand graphs cannot differentiate between reduced demand due to weather vs curtailment of energy usage due to lack of economic resources, the latter of which could be considered COVID related since COVID was an exacerbating factor for households. We'd need to investigate PG&E's disconnection rate, arrearages, and late payments to dive into this aspect. 
+* 2020 is during-COVID period 
+* We would need to conduct weather normalization on pre-COVID home energy usage (2019) and during-COVID home energy usage (2020) to isolate COVID-19's impact, so all observations are not accounting for climatic effects. 
+* Energy usage graphs cannot differentiate between reduced demand due to weather vs curtailment of energy usage due to lack of economic resources, the latter of which could be considered COVID related since COVID was an exacerbating factor for many households. We'd need to investigate PG&E's disconnection rate, arrearages, and late payments to dive into this aspect of COVID's impact. 
 
 ### Observations 
-* There doesn't appear to be a significant difference in home energy usage pre- and post- COVID with respect to both gas and electric usage.
-* In almost every month, post-COVID gas and electric usage/demand is higher than before COVID, suggesting that the year of lockdown did lead to some increased residential usage, barring differences in climate. 
-* The only exception is gas and electric usage in the month of February which was higher before COVID than after, but again this could be because weather in 2020 was more mild than in 2019. If this were the case, people would be cranking their heat pumps or burning more gas for heat in 2019 which created more overall demand than did the lockdown during a warm February. 
-* With respect to home electricity usage, the general shape of the demand curve is consistent pre- and post- COVID with peaks in August and December, presumably due to an increase in electric air conditioners and non-fuel based heating, respectively. 
-* Gas usage pre- and post- COVID also follow the same general shape, peaking in winter as expected. The other  difference beyond February is 2020 gas usage in April, which is higher than 2019 by more kBTUs than in any other month beyond February. But again, April 2020 could have been cooler than in 2019.
+* At first, there doesn't appear to be a significant increase in home energy usage during-COVID as compared to pre-COVID with respect to both gas and electric usage since both lines follow the same general shape, however, the scale of the y-axis is tens of billions kBTUs (10^10) and so the residential increase in energy consumption (gas and electric) during COVID is roughly a couple of billion kBTUs in almost every month, on average, just by eyeing it.  
+* Since this increase in energy consumption during-COVID is in almost every month, it does suggests, barring weather, that COVID did increase gas and electric usage/demand, likely do to the lock-down and work from home orders.
+* The only exception is gas and electric usage in the month of February, which was higher before COVID than during, but again this could be because weather in 2020 was more mild than in 2019. If this were the case, people would be cranking their heat pumps or burning more gas for heat in 2019 which created more overall demand than did the lockdown during a relatively warm February. 
+* With respect to just home electricity usage, the general shape of the demand curve is consistent pre- and during-COVID with peaks in August and December, presumably due to an increase in electric air conditioners and non-fuel based heating, respectively. 
+* Gas usage pre- and during-COVID also follow the same general shape, peaking in winter as expected. 
 
 
 ```{r}
@@ -510,19 +510,18 @@ pge_COVID_commercial_chart <- pge_COVID_commercial %>%
 pge_COVID_commercial_chart
 ```
 
-### Interpretation of COVID-19's impact on PG&E's commercial energy usage (2019 vs 2020):
+### COVID-19's Impact on PG&E's Commercial Energy Usage (2019 vs 2020):
 
 ### Assumptions and Caveats 
 * 2019 is pre-COIVD period
-* 2020 is post-COVID period 
-* We would need to conduct weather normalization on pre-COVID commercial energy usage (2019) and post-COVID commercial energy usage to really isolate COVID-19's impact. 
-* Data source is PG&E in California, which, was more precautions in terms of timing and extent of lockdown policies than say Southern U.S. states. The next graph could compare to GA Power energy usage, for example, although I didn't have time to follow this through.  
+* 2020 is during-COVID period 
+* We would need to conduct weather normalization on pre-COVID commercial energy usage (2019) and during-COVID commercial energy usage to  isolate COVID-19's impact. 
+* The data source is PG&E in California, which, was more precautions in terms of earlier timing and extent of lockdown policies than, say, Southern U.S. states. It may be neat to graph a comparison to a southern utility such as GA Power energy usage, for example, although I didn't have time to follow this through.  
 
 ### Observations 
-* There is a much larger observable difference in commercial energy usage pre- and post- COVID than in the residential sector. 
-* In just about every month, commercial energy usage for both gas and electric were higher pre-COVID than post-COVID, as expected. 
-* Barring weather variations, this suggests that lockdowns and work from home orders caused a significant drop in energy usage in restaurants, retail stores, grocery stores, hotels, and more as these businesses either shut down or had their facility managers significantly reduce operation. This is expected since so many businesses closed completely or operated at reduced hours and shifted to take out rather than dine in.   
-* If repeated to incldue 2021, we should see an uptick in commerical energy usage in PG&E territory since businesses (and universities) have started to re-open. 
+* While this graph of commercial energy consumption appears to have a more significant difference in pre- and during-COVID usage compared to residential, the scale of the y-axis is in billion kBTUs (10^9) compared to the residential sector in tens of billions (10^10) and so the absolute difference is larger in the residential sector. 
+* In just about every month, commercial energy usage for both gas and electric were higher pre-COVID than during-COVID by roughly 1 billion kBTUS, on average, by eyeing it. Barring weather variations, this suggests that lockdowns and work from home orders caused a significant drop in energy usage in restaurants, retail stores, grocery stores, hotels, and more as these businesses either shut down or had their facility managers significantly reduce operation. This is expected since so many businesses closed completely or operated at reduced hours and shifted to take out rather than dine in.   
+* If repeated to include 2021, we should see an uptick in commercial energy usage in PG&E territory since businesses (and universities) have started to re-open. 
 
 
 ```{r}
@@ -610,14 +609,14 @@ pge_COVID_commercial_2021_chart <- pge_COVID_commercial_2021 %>%
 pge_COVID_commercial_2021_chart
 ```
 
-### Interpretation of COVID-19's impact on PG&E's commercial energy usage (2019 through 2021):
+### COVID-19's Impact on PG&E's Commercial Energy Usage (2019 through 2021):
 
 ### Assumptions
-* 2021 represents the after COVID period 
-* 2019 is still pre-COVID 
-* 2020 is now the "during COVID" period since 2021 is now included 
+* 2021 represents the post-COVID period 
+* 2019 is still pre-COVID period
+* 2020 is stil the during-COVID period 
 
 ### Observations
-* As predicted, both electric and gas consumption after COVID (2021) have increased compared to the during COVID (2020) lockdowns. 
+* As predicted, both electric and gas consumption after COVID (2021) have increased compared to the during COVID (2020) lockdowns, suggesting that society has indeed gone back to shopping and eating out.  
 * However, after COVID electricity usage is also significantly higher than pre-COVID (2019) levels, indicating that business operation did not simply return to "normal" but rather ramped-up to make up for "lost time."
 * After COVID gas usages also increases above pre-COVID usage in March and part of April, but pre-COVID gas usage is higher in the other months. This could indicate a cooler 2021 spring than 2019 and/or more business activity that required more fuel.  
