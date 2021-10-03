@@ -1,0 +1,256 @@
+---
+title: "Ch2"
+author: "Jill Grey Ferguson"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(sf)
+library(tigris)
+library(mapview)
+library(leaflet)
+library(censusapi)
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab") 
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+smc_pop_2020 <-
+  getCensus(
+    name = "dec/pl",
+    vintage = 2020,
+    region = "block:*", 
+    regionin = "state:06+county:081",
+    vars = "P1_001N"
+  ) %>% 
+  transmute(
+    block =
+      paste0(state,county,tract,block),
+    pop = P1_001N
+  )
+```
+
+```{r}
+setwd("~/Documents/GitHub/jillgrey.github.io/Assignment_1")
+list.files(
+)
+#Now I'm going to set the computer folder where I saved all the csv's as my working directory and then list the files to make sure it sees them all. 
+```
+
+```{r}
+#The chunk below is looking through all the 2017 through 2020 Quarterly PG&E electric csv files by year and quarter and then it is stacking each one and binding them all together into the variable pge_elec4years in my environment. At first, I tried setting years to 2017:2021 but I got an error:"Error: 'PGE_2021_Q3_ElectricUsageByZip.csv' does not exist in current working directory ('/Users/JillGreyFerguson/Documents/GitHub/jillgrey.github.io/Assignment 1'), since the latest available month is Q2, not Q4, so I had to do the 2021 separately and then bind them together.
+
+years <- 2017:2020
+quarters <- 1:4
+type <- "Electric"
+
+pge_elec4years <- NULL
+
+for(year in years) {
+  for(quarter in quarters) {
+    
+    filename <- 
+      paste0(
+        "PGE_",
+        year,
+        "_Q",
+        quarter,
+        "_",
+        type,
+        "UsageByZip.csv"
+      )
+  
+    print(filename)
+    
+    temp <- read_csv(filename)
+    
+    pge_elec4years <- rbind(pge_elec4years,temp)
+  }
+}
+years <- 2021
+quarters <- 1:2
+type <- "Electric"
+
+pge_elec_this_year <- NULL
+
+for(year in years) {
+  for(quarter in quarters) {
+    
+    filename <- 
+      paste0(
+        "PGE_",
+        year,
+        "_Q",
+        quarter,
+        "_",
+        type,
+        "UsageByZip.csv"
+      )
+  
+    print(filename)
+    
+    temp <- read_csv(filename)
+    
+    pge_elec_this_year <- rbind(pge_elec_this_year,temp)
+  
+  }
+}
+pge_electric <- rbind(pge_elec4years,pge_elec_this_year)
+saveRDS(pge_electric, "pge_electric.rds")
+```
+```
+
+```{r}
+bay_county_names <-
+  c(
+    "Alameda",
+    "Contra Costa",
+    "Marin",
+    "Napa",
+    "San Francisco",
+    "San Mateo",
+    "Santa Clara",
+    "Solano",
+    "Sonoma"
+  )
+
+bay_counties <-
+  counties("CA", cb = T, progress_bar = F) %>%
+  filter(NAME %in% bay_county_names)
+```
+
+```{r}
+ggplot(bay_counties) + geom_sf()
+```
+
+```{r}
+bay_cbgs_clip <- st_read("https://opendata.arcgis.com/datasets/037fc1597b5a4c6994b89c46a8fb4f06_0.geojson")
+```
+
+```{r}
+ca_cities <- places("CA", cb = T, progress_bar = FALSE)
+```
+
+```{r}
+bay_cities <- ca_cities[bay_counties, ]
+
+mapview(bay_counties, alpha.regions = 0) + mapview(bay_cities)
+```
+
+```{r}
+bay_cities_within <-
+  ca_cities %>% 
+  st_centroid() %>% 
+  .[bay_counties, ] %>% 
+  st_set_geometry(NULL) %>% 
+  left_join(ca_cities %>% select(GEOID)) %>% 
+  st_as_sf()
+
+mapview(bay_counties, alpha.regions = 0) + mapview(bay_cities_within, label = "NAME")
+```
+#```{r}
+#bay_cities_within <-
+#  ca_cities[which(ca_cities$GEOID %in% st_centroid(ca_cities)[bay_counties, ]$GEOID), ]
+#```
+
+```{r}
+leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(
+    data = bay_counties,
+    fill = F,
+    weight = 2,
+    label = ~NAME
+  ) %>%
+  addPolygons(
+    data = bay_cities %>% 
+      filter(!GEOID %in% bay_cities_within$GEOID),
+    color = "red",
+    label = ~NAME
+  ) %>% 
+  addPolygons(
+    data = bay_cities_within,
+    color = "green",
+    label = ~NAME
+  )
+```
+
+```{r}
+bay_cbgs <- block_groups("CA", bay_county_names[1:9], cb = T, progress_bar = F)
+```
+
+```{r}
+bay_cbgs <- 
+  bay_county_names %>% 
+  map_dfr(function(county) {
+    block_groups("CA", county, cb = T, progress_bar = F)
+  })
+```
+
+```{r}
+ggplot(bay_cbgs_clip)+geom_sf()
+```
+
+```{r}
+usa_zips <- 
+  zctas(cb = T, progress_bar = F)
+
+bay_zips <-
+  usa_zips %>% 
+  st_centroid() %>% 
+  .[bay_counties, ] %>% 
+  st_set_geometry(NULL) %>% 
+  left_join(usa_zips %>% select(GEOID10)) %>% 
+  st_as_sf()
+
+pge_residential_electric <-
+  pge_electric %>% 
+  filter(CUSTOMERCLASS == "Elec- Residential") %>% 
+  mutate(
+    ZIPCODE = ZIPCODE %>% as.character()
+  ) %>% 
+  group_by(ZIPCODE) %>% 
+  summarize(
+    TOTALKWH = sum(TOTALKWH, na.rm = T)
+  ) %>% 
+  right_join(
+    bay_zips %>% select(GEOID10),
+    by = c("ZIPCODE" = "GEOID10")
+  ) %>% 
+  st_as_sf() %>% 
+  st_transform(4326)
+```
+
+```{r}
+res_pal <- colorNumeric(
+  palette = "Reds",
+  domain = 
+    pge_residential_electric$TOTALKWH
+)
+
+leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(
+    data = pge_residential_electric,
+    fillColor = ~res_pal(TOTALKWH),
+    color = "white",
+    opacity = 0.5,
+    fillOpacity = 0.5,
+    weight = 1,
+    label = ~paste0(
+      round(TOTALKWH), 
+      " kWh total in ",
+      ZIPCODE
+    ),
+    highlightOptions = highlightOptions(
+      weight = 2,
+      opacity = 1
+    )
+  ) %>% 
+  addLegend(
+    data = pge_residential_electric,
+    pal = res_pal,
+    values = ~TOTALKWH,
+    title = "Total Residential<br>kWh, 2020"
+  )
+```
+
